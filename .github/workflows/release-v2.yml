@@ -1,0 +1,19 @@
+name: Publish Khata Book V2 release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create release v2.0 with the APK and the Windows launcher
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view v2.0 >/dev/null 2>&1 || gh release create v2.0 --title "Khata Book V2.0 (latest)" --latest --notes "V2: Google sync and backup, PIN lock, statement PDF to share on WhatsApp, credit due dates with a 9 AM reminder, expense categories and monthly chart. Android app, website and Windows launcher. Installs over V1 and keeps your data. Website: https://1darshankumarsavsani-blip.github.io/Khata-Book/ . Tested on a simulated Android 14 only; sign-in, PDF share and reminders need your real phone."
+          gh release upload v2.0 release/Khata_Book_V2.apk release/Khata_Book_Windows.exe --clobber
