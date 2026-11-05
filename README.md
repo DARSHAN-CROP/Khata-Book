@@ -1,10 +1,18 @@
 # Khata Book (ખાતાવહી)
 
-Offline Android app in Gujarati and English by Darshankumar Savsani (DARSHAN CORPORATION).
+Income, expense and credit (udhar) ledger in Gujarati and English by Darshankumar Savsani (DARSHAN CORPORATION).
 
-Version 1: monthly income/expense ledger, credit (udhar) per person with balance, WhatsApp reminder text. Data stays on the phone.
+**Website (works on phone and PC, no install):** https://1darshankumarsavsani-blip.github.io/Khata-Book/
 
-Install: download `release/Khata_Book_V1.apk` on an Android phone and allow "install unknown apps".
-Source code: `Khata_Book_source.zip` (open in Android Studio, or build with Gradle).
+## Latest: V2.0
 
-Honest note: tested on a simulated Android 14 phone, not yet on a real phone. There is no backup yet; uninstalling the app deletes the data.
+- Google sync and backup: same data on phone and PC (Settings, Sign in with Google).
+- PIN lock.
+- Statement PDF for one person, shared on WhatsApp.
+- Credit due dates, daily 9 AM reminder, overdue marks.
+- Expense categories and a monthly chart (Report tab).
+- Download `Khata_Book_V2.apk` (Android, installs over V1 and keeps data) or `Khata_Book_Windows.exe` (opens the website in its own window; Edge or Chrome needed) from the latest release.
+
+Honest note: tested on a simulated Android 14 phone only. Google sign-in, PDF sharing and reminders need a real phone to confirm. Older versions are on the Releases page.
+
+Source code: `app/` (Java, Android) and `docs/` (website).
