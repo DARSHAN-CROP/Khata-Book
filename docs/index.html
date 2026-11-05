@@ -55,7 +55,8 @@ function save(){S.updated=Date.now();localStorage.setItem(LS,JSON.stringify(S));
 function $(s){return document.querySelector(s)}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function el(h){var d=document.createElement("div");d.innerHTML=h;return d.firstChild}
-function money(n){var s=String(Math.abs(Math.round(n))),l=s.slice(-3),r=s.slice(0,-3);if(r)l=r.replace(/\B(?=(\d{2})+(?!\d))/g,",")+","+l;return (n<0?"-":"")+l}
+function money(n){var a=Math.abs(Math.round(n)),q=a%100,s=String(Math.floor(a/100)),l=s.slice(-3),r=s.slice(0,-3);if(r)l=r.replace(/\B(?=(\d{2})+(?!\d))/g,",")+","+l;return (n<0?"-":"")+l+(q?"."+("0"+q).slice(-2):"")}
+function paise(v){var x=parseFloat(String(v).replace(/,/g,""));return x>0?Math.round(x*100):0}
 function day(ts){return new Date(ts).toLocaleDateString("en-GB",{day:"2-digit",month:"short"})}
 function dstr(ts){return new Date(ts).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"})}
 function sameMonth(ts,off){var a=new Date(ts),n=new Date();n.setDate(1);n.setMonth(n.getMonth()-(off||0));return a.getFullYear()===n.getFullYear()&&a.getMonth()===n.getMonth()}
@@ -75,7 +76,7 @@ function vHome(m){var s=sums(0);
  m.appendChild(el('<div class="card"><div class="muted">'+t("month")+'</div><div class="sum" style="margin-top:8px"><div style="background:var(--g)"><div>'+t("in")+'</div><div class="big">₹'+money(s.i)+'</div></div><div style="background:var(--r)"><div>'+t("out")+'</div><div class="big">₹'+money(s.o)+'</div></div></div><div style="margin-top:10px;text-align:center" class="big">'+t("bal")+': <span class="'+(s.i-s.o>=0?"in":"out")+'">₹'+money(s.i-s.o)+'</span></div></div>'));
  var f=el('<div class="card"><div class="row"><button class="btn" id="bi">'+t("add_in")+'</button><button class="btn red" id="bo">'+t("add_out")+'</button></div><div id="fm"></div></div>');
  function form(type){var fm=f.querySelector("#fm");fm.innerHTML='<input id="a" type="number" inputmode="decimal" placeholder="'+t("amt")+'">'+(type==="out"?'<select id="c">'+CATS.map(function(c){return'<option value="'+c+'">'+t("c_"+c)+'</option>'}).join("")+'</select>':"")+'<input id="n" placeholder="'+t("note")+'"><button class="btn" id="sv">'+t("save")+'</button>';
-  fm.querySelector("#sv").onclick=function(){var a=Math.round(parseFloat(fm.querySelector("#a").value));if(!(a>0))return;var e={id:id(),type:type,amt:a,note:fm.querySelector("#n").value.trim(),ts:Date.now()};if(type==="out")e.cat=fm.querySelector("#c").value;S.entries.push(e);save();render()}}
+  fm.querySelector("#sv").onclick=function(){var a=paise(fm.querySelector("#a").value);if(!(a>0))return;var e={id:id(),type:type,amt:a,note:fm.querySelector("#n").value.trim(),ts:Date.now()};if(type==="out")e.cat=fm.querySelector("#c").value;S.entries.push(e);save();render()}}
  f.querySelector("#bi").onclick=function(){form("in")};f.querySelector("#bo").onclick=function(){form("out")};m.appendChild(f);
  var l=S.entries.slice().sort(function(a,b){return b.ts-a.ts}).slice(0,60);if(!l.length)m.appendChild(el('<div class="muted" style="text-align:center">'+t("none")+'</div>'));
  l.forEach(function(e){var c=el('<div class="card row"><div class="muted" style="width:46px">'+day(e.ts)+'</div><div class="grow"><div>'+esc(e.note||(e.cat?t("c_"+e.cat):""))+'</div>'+(e.cat?'<span class="pill">'+t("c_"+e.cat)+'</span>':"")+'</div><div class="'+(e.type==="in"?"in":"out")+'">'+(e.type==="in"?"+":"-")+' ₹'+money(e.amt)+'</div><button class="x">✕</button></div>');
@@ -95,7 +96,7 @@ function vPerson(m){var p=pById(openP);if(!p){openP=null;return render()}var b=b
  m.appendChild(el('<div class="card"><div class="big" style="font-size:20px">'+esc(p.name)+'</div><div class="'+(b>=0?"in":"out")+'" style="font-size:22px;font-weight:700">₹'+money(Math.abs(b))+'</div><div class="muted">'+(b>0?t("they_owe"):b<0?t("you_owe"):t("settled"))+'</div></div>'));
  var f=el('<div class="card noprint"><div class="row"><button class="btn red" id="g">'+t("gave")+'</button><button class="btn" id="r">'+t("got")+'</button></div><div id="fm"></div></div>');
  function form(type){var fm=f.querySelector("#fm");fm.innerHTML='<input id="a" type="number" inputmode="decimal" placeholder="'+t("amt")+'"><input id="n" placeholder="'+t("note")+'">'+(type==="gave"?'<div class="lbl">'+t("due")+'</div><input id="d" type="date">':"")+'<button class="btn" id="sv">'+t("save")+'</button>';
-  fm.querySelector("#sv").onclick=function(){var a=Math.round(parseFloat(fm.querySelector("#a").value));if(!(a>0))return;var x={id:id(),type:type,amt:a,note:fm.querySelector("#n").value.trim(),ts:Date.now()};var d=fm.querySelector("#d");if(d&&d.value)x.due=new Date(d.value+"T09:00:00").getTime();p.tx.push(x);save();render()}}
+  fm.querySelector("#sv").onclick=function(){var a=paise(fm.querySelector("#a").value);if(!(a>0))return;var x={id:id(),type:type,amt:a,note:fm.querySelector("#n").value.trim(),ts:Date.now()};var d=fm.querySelector("#d");if(d&&d.value)x.due=new Date(d.value+"T09:00:00").getTime();p.tx.push(x);save();render()}}
  f.querySelector("#g").onclick=function(){form("gave")};f.querySelector("#r").onclick=function(){form("got")};m.appendChild(f);
  var ac=el('<div class="card noprint"><button class="btn" id="wa">'+t("share")+'</button><button class="btn grey" id="pf">'+t("pdf")+'</button></div>');
  ac.querySelector("#wa").onclick=function(){window.open("https://wa.me/?text="+encodeURIComponent(stmtText(p)),"_blank")};
