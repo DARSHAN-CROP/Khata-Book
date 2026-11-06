@@ -168,8 +168,11 @@ final class Sync {
             pe.put(new JSONObject().put("id", o.optString("id")).put("name", o.optString("name")).put("tx", tx));
         }
         s.saveRaw();
-        return new JSONObject().put("entries", en).put("people", pe)
-                .put("settings", new JSONObject().put("lang", s.lang())).put("updated", s.updated());
+        JSONObject set = s.getObj("settings") == null ? new JSONObject() : new JSONObject(s.getObj("settings").toString());
+        set.put("lang", s.lang());
+        JSONObject bud = s.getObj("budgets") == null ? new JSONObject() : new JSONObject(s.getObj("budgets").toString());
+        return new JSONObject().put("entries", en).put("people", pe).put("budgets", bud)
+                .put("settings", set).put("updated", s.updated());
     }
 
     static void fromWeb(JSONObject w, Store s) throws Exception {
@@ -197,6 +200,12 @@ final class Sync {
         }
         s.put("entries", en);
         s.put("people", pe);
+        if (w.optJSONObject("budgets") != null) s.put("budgets", w.getJSONObject("budgets"));
+        if (w.optJSONObject("settings") != null) {
+            JSONObject ws = new JSONObject(w.getJSONObject("settings").toString());
+            ws.remove("lang"); // the language stays whatever this phone uses
+            s.put("settings", ws);
+        }
         s.put("updated", w.optDouble("updated", System.currentTimeMillis()));
         s.saveRaw();
         Reminders.schedule(s.context());
