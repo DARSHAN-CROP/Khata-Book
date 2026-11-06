@@ -36,11 +36,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MainActivity extends Activity {
-    static final int TEAL = 0xFF0E8F7E, BG = 0xFFF4F6F6, INK = 0xFF1B1F1F, MUTED = 0xFF66706F;
-    static final int GREEN = 0xFF1E9E63, RED = 0xFFD64545, GREY = 0xFFEAEFEE;
+    static int TEAL = 0xFF0E8F7E, BG = 0xFFF4F6F6, INK = 0xFF1B1F1F, MUTED = 0xFF66706F;
+    static final int GREEN = 0xFF1E9E63, RED = 0xFFD64545;
+    static int GREY = 0xFFEAEFEE;
 
     Store st;
-    LinearLayout content, nav;
+    LinearLayout content, nav, root, head;
     TextView title;
     Button langBtn;
     int tab = 0;
@@ -60,11 +61,11 @@ public class MainActivity extends Activity {
         Reminders.schedule(this);
         getWindow().setStatusBarColor(TEAL);
 
-        LinearLayout root = new LinearLayout(this);
+        root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(BG);
 
-        LinearLayout head = Ui.row(this);
+        head = Ui.row(this);
         head.setBackgroundColor(TEAL);
         head.setPadding(Ui.dp(this, 16), Ui.dp(this, 12), Ui.dp(this, 12), Ui.dp(this, 12));
         title = Ui.text(this, "", 20, Color.WHITE, true);
@@ -179,6 +180,8 @@ public class MainActivity extends Activity {
         return (paise < 0 ? "-" : "") + r;
     }
 
+    static String plain(long paise) { return paise % 100 == 0 ? String.valueOf(paise / 100) : String.format(Locale.US, "%.2f", paise / 100.0); }
+
     static long parse(String s) {
         try {
             BigDecimal d = new BigDecimal(s.trim().replace(",", ""));
@@ -266,6 +269,12 @@ public class MainActivity extends Activity {
     // ---------------------------------------------------------------- shell
 
     void render() {
+        Theme.load(st);
+        TEAL = Theme.accent; BG = Theme.bg; INK = Theme.ink; MUTED = Theme.muted; GREY = Theme.grey;
+        root.setBackgroundColor(BG);
+        head.setBackgroundColor(TEAL);
+        getWindow().setStatusBarColor(TEAL);
+        nav.setBackgroundColor(Theme.card);
         title.setText(L.t("app"));
         langBtn.setText(L.t("lang_btn"));
         nav.removeAllViews();
@@ -318,6 +327,7 @@ public class MainActivity extends Activity {
         LinearLayout.LayoutParams bl = Ui.match();
         bl.setMargins(0, 0, 0, Ui.dp(this, 12));
         content.addView(btns, bl);
+        V3.alerts(this);
 
         if (a.length() == 0) { content.addView(empty(L.t("no_entries"))); return; }
         ArrayList<JSONObject> list = new ArrayList<>();
@@ -325,6 +335,8 @@ public class MainActivity extends Activity {
         Collections.sort(list, new Comparator<JSONObject>() {
             public int compare(JSONObject x, JSONObject y) { return Long.compare(y.optLong("ts"), x.optLong("ts")); }
         });
+        list = V3.apply(list);
+        V3.filterBar(this, list.size());
         for (final JSONObject o : list) {
             boolean isIn = o.optString("type").equals("in");
             LinearLayout card = Ui.card(this);
@@ -599,6 +611,7 @@ public class MainActivity extends Activity {
     }
 
     void report() {
+        content.addView(V3.budgetCard(this));
         JSONArray a = st.arr("entries");
         long[] by = new long[CATS.length];
         long[] in = new long[6], out = new long[6];
@@ -652,6 +665,10 @@ public class MainActivity extends Activity {
     // ---------------------------------------------------------------- settings
 
     void settings() {
+        content.addView(V3.appearanceCard(this));
+        LinearLayout cx = Ui.card(this);
+        cx.addView(Ui.button(this, L.t("csv_btn"), GREY, INK, v -> V3.exportCsv(this)));
+        content.addView(cx);
         // sync
         LinearLayout c0 = Ui.card(this);
         c0.addView(Ui.text(this, L.t("sync_title"), 17, INK, true));

@@ -1,0 +1,19 @@
+name: Publish Khata Book V3 release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create release v3.0 with the APK and the Windows launcher
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view v3.0 >/dev/null 2>&1 || gh release create v3.0 --title "Khata Book V3.0 (latest)" --latest --notes "V3: appearance settings (theme colour, dark mode, text size, bold, contrast), monthly category budgets with warnings, search and filters, Excel/CSV export. Android app and website. Installs over older versions and keeps your data. Website: https://1darshankumarsavsani-blip.github.io/Khata-Book/ . Tested on a simulated Android 14 and a headless browser only; check sign-in, sharing and reminders on your phone."
+          gh release upload v3.0 release/Khata_Book_V3.apk release/Khata_Book_Windows.exe --clobber

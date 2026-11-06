@@ -32,7 +32,7 @@ public class FileShare extends ContentProvider {
         return c;
     }
 
-    @Override public String getType(Uri uri) { return uri.getLastPathSegment() != null && uri.getLastPathSegment().endsWith(".pdf") ? "application/pdf" : "application/json"; }
+    @Override public String getType(Uri uri) { return uri.getLastPathSegment() != null && uri.getLastPathSegment().endsWith(".pdf") ? "application/pdf" : uri.getLastPathSegment() != null && uri.getLastPathSegment().endsWith(".csv") ? "text/csv" : "application/json"; }
     @Override public Uri insert(Uri u, ContentValues v) { return null; }
     @Override public int delete(Uri u, String s, String[] a) { return 0; }
     @Override public int update(Uri u, ContentValues v, String s, String[] a) { return 0; }
