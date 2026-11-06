@@ -34,6 +34,8 @@ final class Store {
         Sync.poke(ctx);
     }
 
+    JSONObject getObj(String k) { return d.optJSONObject(k); }
+
     void put(String k, Object v) { try { d.put(k, v); } catch (JSONException ignored) { } }
 
     JSONArray arr(String k) {
